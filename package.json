@@ -1,0 +1,22 @@
+{
+  "name": "is_course_service",
+  "version": "1.0.0",
+  "description": "Only for study",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imDrOne/is_course_service.git"
+  },
+  "keywords": [
+    "study"
+  ],
+  "author": "andrey tikholoz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/imDrOne/is_course_service/issues"
+  },
+  "homepage": "https://github.com/imDrOne/is_course_service#readme"
+}
