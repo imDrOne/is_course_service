@@ -8,6 +8,7 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
   host: DB_HOST,
   dialect: 'postgres',
   port: DB_PORT,
+  schema: 'main',
   dialectOptions: {
     ssl: {
       require: true,
@@ -16,7 +17,7 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
   },
 });
 
-module.exports = () => new Promise((resolve, reject) => {
+const connect = () => new Promise((resolve, reject) => {
   sequelize.authenticate()
     .then(() => {
       resolve('connected to DB');
@@ -25,3 +26,8 @@ module.exports = () => new Promise((resolve, reject) => {
       reject(`FUCK \n${error}`);
     });
 });
+
+module.exports = {
+  connect,
+  sequelize,
+};
