@@ -6,7 +6,7 @@ const birds = require('./router/controllers/auth.controller');
 const swaggerDocument = require('./swagger-ui.json');
 
 const app = express();
-const PORT = process.env.APP_HOST || 3000;
+const PORT = process.env.PORT || 3000;
 const BASE_API_URL = `/${process.env.APP_API_VERSION}/api/uis-dashboard-service`;
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
