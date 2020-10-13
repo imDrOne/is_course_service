@@ -14,7 +14,7 @@ module.exports = {
     host: DB_HOST,
     port: DB_PORT,
     dialect: 'postgres',
-    // schema: 'main',
+    schema: 'main',
     dialectOptions: {
       ssl: {
         require: true,
@@ -29,7 +29,7 @@ module.exports = {
     host: DB_HOST,
     port: DB_PORT,
     dialect: 'postgres',
-    // schema: 'main',
+    schema: 'main',
     dialectOptions: {
       ssl: {
         require: true,
@@ -44,7 +44,7 @@ module.exports = {
     host: DB_HOST,
     port: DB_PORT,
     dialect: 'postgres',
-    // schema: 'main',
+    schema: 'main',
     dialectOptions: {
       ssl: {
         require: true,
