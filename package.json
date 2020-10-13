@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "nodemon",
-    "start": "node src/main.js"
+    "start": "node src/main.js",
+    "migrate":"npx sequelize-cli db:migrate",
+    "undo-migrate": "npx sequelize-cli db:migrate:undo"
   },
   "repository": {
     "type": "git",
@@ -34,6 +36,7 @@
     "eslint": "^7.11.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.1",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "sequelize-cli": "^6.2.0"
   }
 }

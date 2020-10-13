@@ -1,9 +1,5 @@
-const dotenv = require('dotenv');
-
-dotenv.config();
-const { sequelize, connect } = require('./sequelize.config');
+const { DB } = require('./db.config');
 
 module.exports = {
-  sequelize,
-  connect,
+  DB,
 };

@@ -1,7 +1,7 @@
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 
-const { connect: dbConnection, sequelize } = require('./config');
+const { DB } = require('./config');
 const birds = require('./router/controllers/auth.controller');
 const swaggerDocument = require('./swagger-ui.json');
 
@@ -18,13 +18,14 @@ app.get('/', (req, res) => {
 
 app.use(`${BASE_API_URL}/auth-controller`, birds);
 
-(async (schema, options) => {
+(async () => {
   try {
-    await dbConnection();
-    await sequelize.sync({ force: true });
-    await sequelize.createSchema('main', options);
+    await DB.connect();
+    await DB.createSchema();
+    await DB.synchronize();
     app.listen(PORT);
   } catch (e) {
+    console.error(e);
     process.exit(1);
   }
 })();
