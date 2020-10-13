@@ -27,6 +27,6 @@ module.exports = {
     }, { schema: 'main' });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('Users', { schema: 'main' });
   },
 };
