@@ -13,7 +13,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get('/', (req, res) => {
   res.send('Tikholoz A. UIS - 411. [SERVICE]');
-  res.json({ ...req });
+  res.json(req);
 });
 
 app.use(`${BASE_API_URL}/auth-controller`, birds);
