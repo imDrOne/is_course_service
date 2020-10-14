@@ -1,21 +1,31 @@
 const express = require('express');
-const { connect: dbConnection, sequelize } = require('./config');
-const { User } = require('./models');
+const swaggerUi = require('swagger-ui-express');
+
+const { DB } = require('./config');
+const birds = require('./router/controllers/auth.controller');
+const swaggerDocument = require('./swagger-ui.json');
 
 const app = express();
-const PORT = process.env.APP_HOST || 3000;
+const PORT = process.env.PORT || 3000;
+const BASE_API_URL = `/${process.env.APP_API_VERSION}/api/uis-dashboard-service`;
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Tikholoz A. UIS - 411. [SERVICE]');
+  res.json(req);
 });
 
-(async (schema, options) => {
+app.use(`${BASE_API_URL}/auth-controller`, birds);
+
+(async () => {
   try {
-    await dbConnection();
-    await sequelize.sync({ force: true });
-    await sequelize.createSchema('main', options);
+    await DB.connect();
+    await DB.createSchema();
+    await DB.synchronize();
     app.listen(PORT);
   } catch (e) {
+    console.error(e);
     process.exit(1);
   }
 })();

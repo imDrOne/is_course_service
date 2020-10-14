@@ -5,7 +5,10 @@
   "main": "./src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "nodemon"
+    "serve": "nodemon",
+    "start": "node src/main.js",
+    "migrate":"npx sequelize-cli db:migrate",
+    "undo-migrate": "npx sequelize-cli db:migrate:undo"
   },
   "repository": {
     "type": "git",
@@ -26,12 +29,14 @@
     "express": "^4.17.1",
     "pg": "^8.4.1",
     "pg-hstore": "^2.3.3",
-    "sequelize": "^6.3.5"
+    "sequelize": "^6.3.5",
+    "swagger-ui-express": "^4.1.4"
   },
   "devDependencies": {
     "eslint": "^7.11.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.1",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "sequelize-cli": "^6.2.0"
   }
 }
