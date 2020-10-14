@@ -15,7 +15,9 @@ module.exports = {
     port: DB_PORT,
     dialect: 'postgres',
     schema: 'main',
+    searchPath: 'main',
     dialectOptions: {
+      prependSearchPath: true,
       ssl: {
         require: true,
         rejectUnauthorized: false,
@@ -30,7 +32,9 @@ module.exports = {
     port: DB_PORT,
     dialect: 'postgres',
     schema: 'main',
+    searchPath: 'main',
     dialectOptions: {
+      prependSearchPath: true,
       ssl: {
         require: true,
         rejectUnauthorized: false,
@@ -45,7 +49,9 @@ module.exports = {
     port: DB_PORT,
     dialect: 'postgres',
     schema: 'main',
+    searchPath: 'main',
     dialectOptions: {
+      prependSearchPath: true,
       ssl: {
         require: true,
         rejectUnauthorized: false,
