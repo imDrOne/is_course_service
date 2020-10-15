@@ -1,4 +1,7 @@
 const models = require('../../db/models');
+const { auth } = require('../../utils');
+
+const { setPassword } = auth;
 
 const excludeOption = {
   attributes: {
@@ -22,7 +25,7 @@ class UserService {
     const { 'user-id': id } = req.headers;
 
     try {
-      const user = await models.User.findAll({
+      const user = await models.User.findOne({
         where: { id },
         ...excludeOption,
       });
@@ -34,13 +37,19 @@ class UserService {
   }
 
   static async createUser(req, res) {
-    const { firstName, lastName, email } = req.body;
+    const {
+      firstName, lastName, email, password,
+    } = req.body;
+
+    const { salt, hash } = setPassword(password);
 
     try {
       await models.User.create({
         firstName,
         lastName,
         email,
+        salt,
+        hash,
       });
       const updatedUserList = await UserService.getAllUsers(req, res);
       res.json(updatedUserList);

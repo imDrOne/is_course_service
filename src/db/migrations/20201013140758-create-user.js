@@ -16,6 +16,16 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      hash: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      salt: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       createdAt: {
         type: Sequelize.DATE,
