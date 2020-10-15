@@ -18,6 +18,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      hash: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      salt: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       createdAt: {
         type: Sequelize.DATE,
         default: new Date(),

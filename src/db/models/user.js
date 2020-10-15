@@ -16,6 +16,8 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
     },
+    hash: DataTypes.STRING,
+    salt: DataTypes.STRING,
     fullName: {
       type: DataTypes.VIRTUAL,
       get() {
