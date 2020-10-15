@@ -9,6 +9,7 @@ module.exports = {
       },
       firstName: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       lastName: {
         type: Sequelize.STRING,
@@ -17,12 +18,12 @@ module.exports = {
         type: Sequelize.STRING,
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
+        default: new Date(),
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
+        default: new Date(),
       },
     });
   },
