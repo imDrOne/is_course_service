@@ -15,6 +15,10 @@ module.exports = (sequelize, DataTypes) => {
           msg: 'Данный почтовый адрес не валиден',
         },
       },
+      unique: {
+        args: true,
+        msg: 'Данный почтовый адрес уже используется',
+      },
     },
     hash: DataTypes.STRING,
     salt: DataTypes.STRING,
