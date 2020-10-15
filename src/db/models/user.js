@@ -8,7 +8,14 @@ module.exports = (sequelize, DataTypes) => {
   User.init({
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
-    email: DataTypes.STRING,
+    email: {
+      type: DataTypes.STRING,
+      validate: {
+        isEmail: {
+          msg: 'Данный почтовый адрес не валиден',
+        },
+      },
+    },
     fullName: {
       type: DataTypes.VIRTUAL,
       get() {
