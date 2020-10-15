@@ -1,23 +1,35 @@
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
+const bodyParser = require('body-parser');
 
+// Init app express
+const app = express();
+
+// Data Base
 const { DB } = require('./config');
-const birds = require('./router/controllers/auth.controller');
+const auth = require('./router/controllers/auth.controller');
+const users = require('./router/controllers/users.controller');
+
+// Swagger
 const swaggerDocument = require('./swagger-ui.json');
 
-const app = express();
+// Vars
 const PORT = process.env.PORT || 3000;
 const BASE_API_URL = `/${process.env.APP_API_VERSION}/api/uis-dashboard-service`;
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// Middlewares
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
+// Routes
 app.get('/', (req, res) => {
   res.send('Tikholoz A. UIS - 411. [SERVICE]');
-  res.json(req);
 });
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(`${BASE_API_URL}/auth-controller`, auth);
+app.use(`${BASE_API_URL}/users-controller`, users);
 
-app.use(`${BASE_API_URL}/auth-controller`, birds);
-
+// Start service
 (async () => {
   try {
     await DB.connect();
