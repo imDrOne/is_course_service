@@ -7,6 +7,7 @@ const app = express();
 // Data Base
 const { DB } = require('./config');
 const auth = require('./router/controllers/auth.controller');
+const users = require('./router/controllers/users.controller');
 
 // Swagger
 const swaggerDocument = require('./swagger-ui.json');
@@ -21,7 +22,7 @@ app.get('/', (req, res) => {
 });
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(`${BASE_API_URL}/auth-controller`, auth);
-app.use(`${BASE_API_URL}/user-controller`, auth);
+app.use(`${BASE_API_URL}/users-controller`, users);
 
 
 // Start service
