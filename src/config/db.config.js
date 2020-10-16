@@ -1,14 +1,10 @@
-const { Sequelize } = require('sequelize');
+const { sequelize } = require('../db/models');
 
 const env = process.env.NODE_ENV || 'development';
 
 const {
   database, username, password, ...options
 } = require('./migration.config')[env];
-
-const sequelize = new Sequelize(database, username, password, {
-  ...options,
-});
 
 class DB {
   static synchronize() {
@@ -25,12 +21,15 @@ class DB {
 
   static connect() {
     return new Promise((resolve, reject) => {
+      console.log('Connecting to database...');
       sequelize.authenticate()
         .then(() => {
-          resolve('Successful connection to data base...');
+          console.log('Successful connection to data base...');
+          resolve();
         })
         .catch((error) => {
-          reject(`FUCK: \n${error}`);
+          console.log(`FUCK: \n${error}`);
+          reject();
         });
     });
   }
