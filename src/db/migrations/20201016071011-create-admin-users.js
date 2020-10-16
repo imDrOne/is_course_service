@@ -8,7 +8,7 @@ const adminPswd = process.env.USER_ADMIN_PSWD;
 const { hash, salt } = setPassword(adminPswd);
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async (queryInterface) => {
     await queryInterface.bulkInsert('Users', [{
       firstName: 'Admin',
       email: 'admin@mail.ru',
@@ -17,7 +17,7 @@ module.exports = {
     }], {});
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.bulkDelete('Users', null, {});
   },
 };

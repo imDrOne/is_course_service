@@ -1,4 +1,4 @@
-const { sequelize } = require('../db/models');
+const { sequelize, umzug } = require('../db/models');
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -32,6 +32,10 @@ class DB {
           reject();
         });
     });
+  }
+
+  static upMigration() {
+    umzug.up();
   }
 }
 

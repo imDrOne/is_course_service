@@ -1,5 +1,7 @@
+const Sequelize = require('sequelize');
+
 module.exports = {
-  up: async (queryInterface, Sequelize) => queryInterface.addColumn(
+  up: async (queryInterface) => queryInterface.addColumn(
     {
       tableName: 'Permissions',
       schema: 'main',
@@ -16,7 +18,7 @@ module.exports = {
     },
   ),
 
-  down: async (queryInterface, Sequelize) => queryInterface.removeColumn(
+  down: async (queryInterface) => queryInterface.removeColumn(
     {
       tableName: 'Permissions',
       schema: 'main',
