@@ -21,6 +21,6 @@ module.exports = {
       tableName: 'Permissions',
       schema: 'main',
     },
-    'UserId',
+    'userId',
   ),
 };
