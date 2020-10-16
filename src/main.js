@@ -34,7 +34,8 @@ app.use(`${BASE_API_URL}/users-controller`, users);
   try {
     await DB.connect();
     await DB.createSchema();
-    await DB.synchronize();
+    await DB.upMigration();
+
     app.listen(PORT);
   } catch (e) {
     console.error(e);

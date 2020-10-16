@@ -8,7 +8,8 @@
     "serve": "nodemon",
     "start": "node src/main.js",
     "migrate": "npx sequelize-cli db:migrate",
-    "undo-migrate": "npx sequelize-cli db:migrate:undo:all"
+    "undo-migrate": "npx sequelize-cli db:migrate:undo:all",
+    "seeders": "npx sequelize-cli db:seed:all"
   },
   "repository": {
     "type": "git",
@@ -31,7 +32,8 @@
     "pg": "^8.4.1",
     "pg-hstore": "^2.3.3",
     "sequelize": "^6.3.5",
-    "swagger-ui-express": "^4.1.4"
+    "swagger-ui-express": "^4.1.4",
+    "umzug": "^2.3.0"
   },
   "devDependencies": {
     "eslint": "^7.11.0",
