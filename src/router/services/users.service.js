@@ -1,5 +1,6 @@
 const models = require('../../db/models');
 const { auth } = require('../../utils');
+const { userValidation } = require('../../utils/validation');
 
 const { setPassword } = auth;
 
