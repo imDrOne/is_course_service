@@ -29,7 +29,6 @@ class UserService {
         where: { id },
         ...excludeOption,
       });
-
       res.json(user);
     } catch (e) {
       res.json(e);
@@ -59,7 +58,7 @@ class UserService {
   }
 
   static async deleteUserById(req, res) {
-    const { 'user-id': id } = req.headers;
+    const { userid: id } = req.headers;
 
     try {
       await models.User.destroy({
