@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 
 module.exports = {
-  up: async (queryInterface) => queryInterface.createTable('Users_as_permissions', {
+  up: async (queryInterface) => queryInterface.createTable('users_as_permissions', {
     id: {
       allowNull: false,
       autoIncrement: true,
@@ -10,12 +10,12 @@ module.exports = {
     },
     userId: {
       type: Sequelize.INTEGER,
-      references: { model: 'Users', key: 'id' },
+      references: { model: 'users', key: 'id' },
       onDelete: 'CASCADE',
     },
     permissionId: {
       type: Sequelize.INTEGER,
-      references: { model: 'Permissions', key: 'id' },
+      references: { model: 'permissions', key: 'id' },
       onDelete: 'CASCADE',
     },
   }),

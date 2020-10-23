@@ -9,7 +9,7 @@ const { hash, salt } = setPassword(adminPswd);
 
 module.exports = {
   up: async (queryInterface) => {
-    await queryInterface.bulkInsert('Users', [{
+    await queryInterface.bulkInsert('users', [{
       firstName: 'Admin',
       email: 'admin@mail.ru',
       hash,
@@ -18,6 +18,6 @@ module.exports = {
   },
 
   down: async (queryInterface) => {
-    await queryInterface.bulkDelete('Users', null, {});
+    await queryInterface.bulkDelete('users', null, {});
   },
 };
