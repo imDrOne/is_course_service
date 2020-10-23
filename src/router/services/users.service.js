@@ -3,18 +3,10 @@ const { auth } = require('../../utils');
 
 const { setPassword } = auth;
 
-const excludeOption = {
-  attributes: {
-    exclude: ['createdAt', 'updatedAt'],
-  },
-};
-
 class UserService {
   static async getAllUsers(req, res) {
     try {
-      const users = await models.User.findAll({
-        ...excludeOption,
-      });
+      const users = await models.Users.findAll();
       res.json(users);
     } catch (e) {
       res.json(e);
@@ -25,9 +17,8 @@ class UserService {
     const { 'user-id': id } = req.headers;
 
     try {
-      const user = await models.User.findOne({
+      const user = await models.Users.findOne({
         where: { id },
-        ...excludeOption,
       });
       res.json(user);
     } catch (e) {
@@ -43,7 +34,7 @@ class UserService {
     const { salt, hash } = setPassword(password);
 
     try {
-      await models.User.create({
+      await models.Users.create({
         firstName,
         lastName,
         email,
@@ -61,7 +52,7 @@ class UserService {
     const { userid: id } = req.headers;
 
     try {
-      await models.User.destroy({
+      await models.Users.destroy({
         where: { id },
       });
       const updatedUserList = await UserService.getAllUsers(req, res);
@@ -77,7 +68,7 @@ class UserService {
     } = req.body;
 
     try {
-      await models.User.update(
+      await models.Users.update(
         { ...body },
         { where: { id } },
       );

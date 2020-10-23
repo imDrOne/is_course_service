@@ -12,14 +12,6 @@ module.exports = {
       permissionName: {
         type: Sequelize.STRING,
       },
-      createdAt: {
-        default: new Date(),
-        type: Sequelize.DATE,
-      },
-      updatedAt: {
-        default: new Date(),
-        type: Sequelize.DATE,
-      },
     });
   },
   down: async (queryInterface) => {

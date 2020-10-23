@@ -29,14 +29,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      createdAt: {
-        type: Sequelize.DATE,
-        default: new Date(),
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        default: new Date(),
-      },
     });
   },
   down: async (queryInterface) => {
