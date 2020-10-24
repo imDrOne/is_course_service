@@ -7,7 +7,7 @@ class AuthService {
   static async login(req, res) {
     const { login, password } = req.body;
 
-    const user = await models.User.findOne({
+    const user = await models.Users.findOne({
       where: { email: login },
     });
 
