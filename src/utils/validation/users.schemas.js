@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const usersSchemas = {
   userId: {
-    userid: Joi.number().required(),
+    'user-id': Joi.number().required(),
   },
   newUser: {
     firstName: Joi.string().min(1).required(),

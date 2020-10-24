@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       Users.belongsToMany(models.Permissions, {
         through: 'UsersAsPermissions',
       });
+      Users.hasMany(models.UserTokens);
     }
   }
 
@@ -37,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    timestamp: false,
+    timestamps: false,
     modelName: 'Users',
     tableName: 'users',
   });
