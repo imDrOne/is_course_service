@@ -1,13 +1,16 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
+  class Users extends Model {
     static associate(models) {
-      User.hasMany(models.Permissions);
+      Users.belongsToMany(models.Permissions, {
+        through: 'UsersAsPermissions',
+      });
+      Users.hasMany(models.UserTokens);
     }
   }
 
-  User.init({
+  Users.init({
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
     email: {
@@ -35,9 +38,10 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    modelName: 'User',
-    tableName: 'Users',
+    timestamps: false,
+    modelName: 'Users',
+    tableName: 'users',
   });
 
-  return User;
+  return Users;
 };

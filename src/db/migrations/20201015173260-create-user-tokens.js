@@ -2,36 +2,36 @@ const Sequelize = require('sequelize');
 
 module.exports = {
   up: async (queryInterface) => {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('user_tokens', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      firstName: {
-        type: Sequelize.STRING,
+      accessToken: {
         allowNull: false,
+        type: Sequelize.STRING(1024),
       },
-      lastName: {
-        type: Sequelize.STRING,
-      },
-      email: {
-        type: Sequelize.STRING,
+      refreshToken: {
         allowNull: false,
-        unique: true,
+        type: Sequelize.STRING(1024),
       },
-      hash: {
-        type: Sequelize.STRING,
+      startDate: {
         allowNull: false,
+        type: Sequelize.DATE,
       },
-      salt: {
-        type: Sequelize.STRING,
+      expirationDate: {
         allowNull: false,
+        type: Sequelize.DATE,
+      },
+      exitDate: {
+        allowNull: true,
+        type: Sequelize.DATE,
       },
     });
   },
   down: async (queryInterface) => {
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable('user_tokens');
   },
 };

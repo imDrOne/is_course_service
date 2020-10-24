@@ -1,12 +1,11 @@
 module.exports = {
   up: async (queryInterface) => {
-    await queryInterface.bulkInsert('Permissions', [{
+    await queryInterface.bulkInsert('permissions', [{
       permissionName: 'canCreateUsers',
-      userId: 1,
     }], {});
   },
 
   down: async (queryInterface) => {
-    await queryInterface.bulkDelete('Permissions', null, {});
+    await queryInterface.bulkDelete('permissions', null, {});
   },
 };
