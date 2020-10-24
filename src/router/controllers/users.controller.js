@@ -7,9 +7,9 @@ const { userValidations } = require('../../utils/middlewares');
 
 const {
   usersValidationSchemas: {
-    updateTest,
-    newUser,
+    updateUser,
     userId,
+    newUser,
   },
 } = require('../../utils/validation');
 
@@ -45,7 +45,7 @@ router.delete(
 
 router.put(
   '/updateUserById',
-  userValidations(updateTest, 'body'),
+  userValidations(updateUser.get(), 'body'),
   UserService.updateUserById,
 );
 

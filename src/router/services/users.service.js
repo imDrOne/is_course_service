@@ -49,7 +49,7 @@ class UserService {
   }
 
   static async deleteUserById(req, res) {
-    const { userid: id } = req.headers;
+    const { 'user-id': id } = req.headers;
 
     try {
       await models.Users.destroy({
