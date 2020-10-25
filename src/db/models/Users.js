@@ -6,7 +6,9 @@ module.exports = (sequelize, DataTypes) => {
       Users.belongsToMany(models.Permissions, {
         through: 'UsersAsPermissions',
       });
-      Users.hasMany(models.UserTokens);
+      Users.hasMany(models.UserTokens, {
+        foreignKey: 'userId',
+      });
     }
   }
 
