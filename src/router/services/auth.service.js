@@ -1,3 +1,5 @@
+/* eslint-disable prefer-promise-reject-errors */
+
 const { DateTime } = require('luxon');
 const { Op } = require('sequelize');
 const models = require('../../db/models');
@@ -8,10 +10,12 @@ const { validatePassword, generateToken, checkToken: check } = auth;
 const findActiveToken = async (userId) => {
   try {
     return await models.UserTokens.findOne({
-      attributes: ['accessToken', 'refreshToken'],
       where: {
         expirationDate: {
           [Op.gt]: DateTime.local().plus({ hours: 3 }).toString(),
+        },
+        exitDate: {
+          [Op.is]: null,
         },
         userId,
       },
@@ -22,7 +26,7 @@ const findActiveToken = async (userId) => {
 };
 
 const writeUpNewToken = async (login) => {
-  const expAtAccessTime = DateTime.local().plus({ minutes: 1 });
+  const expAtAccessTime = DateTime.local().plus({ minutes: 2 });
   const expAtRefreshTime = DateTime.local().plus({ hours: 8 });
 
   const accessToken = generateToken({
@@ -42,7 +46,7 @@ const writeUpNewToken = async (login) => {
     await models.UserTokens.create({
       accessToken,
       refreshToken,
-      startDate: DateTime.local().plus({ hours: 3 }), // because i fuck this timezone
+      startDate: DateTime.local().plus({ hours: 3 }).toString(), // because i fuck this timezone
       expirationDate: expAtAccessTime.plus({ hours: 3 }), // because i fuck this timezone
       userId: id,
     });
@@ -97,10 +101,17 @@ class AuthService {
   }
 
   static async checkToken(req, res) {
-    const { token } = req.headers;
+    const { token, 'user-id': userId } = req.headers;
 
     try {
+      const user = await findActiveToken(userId);
+
+      if (!user) {
+        await Promise.reject('Session is already expired');
+      }
+
       await check(token);
+
       res.status(200).json({
         message: 'Token is valid',
       });
@@ -108,6 +119,30 @@ class AuthService {
       res.status(400).send({
         message: err,
       });
+    }
+  }
+
+  static async logout(req, res) {
+    const { 'user-id': userId } = req.headers;
+
+    try {
+      await models.UserTokens.update({
+        exitDate: DateTime.local().plus({ hours: 3 }).toString(),
+      },
+      {
+        where: {
+          expirationDate: {
+            [Op.gt]: DateTime.local().plus({ hours: 3 }).toString(),
+          },
+          userId,
+        },
+      });
+
+      res.status(200).json({
+        message: 'Success exit',
+      });
+    } catch (e) {
+      res.status(422).send({ e });
     }
   }
 }
