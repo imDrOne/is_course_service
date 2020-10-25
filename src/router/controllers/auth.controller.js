@@ -13,5 +13,6 @@ router.get('/', (req, res) => {
 router.post('/login', AuthService.login);
 router.get('/check-token', AuthService.checkToken);
 router.put('/logout', AuthService.logout);
+router.put('/refresh-token', AuthService.refreshToken);
 
 module.exports = router;
