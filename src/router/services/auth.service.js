@@ -26,7 +26,7 @@ const findActiveToken = async (userId) => {
 };
 
 const writeUpNewToken = async (login) => {
-  const expAtAccessTime = DateTime.local().plus({ minutes: 2 });
+  const expAtAccessTime = DateTime.local().plus({ minutes: 1 });
   const expAtRefreshTime = DateTime.local().plus({ hours: 8 });
 
   const accessToken = generateToken({
@@ -140,6 +140,41 @@ class AuthService {
 
       res.status(200).json({
         message: 'Success exit',
+      });
+    } catch (e) {
+      res.status(422).send({ e });
+    }
+  }
+
+  static async refreshToken(req, res) {
+    const { 'refresh-token': refreshToken, 'access-token': accessToken, login } = req.headers;
+
+    try {
+      await check(refreshToken);
+      const expAtAccessTime = DateTime.local().plus({ minutes: 1 });
+
+      const newAccessToken = generateToken({
+        login,
+        exp: expAtAccessTime.toSeconds(),
+      });
+
+      const result = await models.UserTokens.update({
+        accessToken: newAccessToken,
+        expirationDate: expAtAccessTime.plus({ hours: 3 }),
+      }, {
+        where: {
+          accessToken,
+          refreshToken,
+          exitDate: {
+            [Op.is]: null,
+          },
+        },
+      });
+
+      if (!result[0]) await Promise.reject('Session is already expired');
+
+      res.status(201).json({
+        accessToken: newAccessToken,
       });
     } catch (e) {
       res.status(422).send({ e });
