@@ -1,13 +1,70 @@
+/* eslint-disable prefer-promise-reject-errors */
+
+const { DateTime } = require('luxon');
+const { Op } = require('sequelize');
 const models = require('../../db/models');
 const { auth } = require('../../utils');
 
-const { validatePassword } = auth;
+const { validatePassword, generateToken, checkToken: check } = auth;
+
+const findActiveToken = async (userId) => {
+  try {
+    return await models.UserTokens.findOne({
+      where: {
+        expirationDate: {
+          [Op.gt]: DateTime.local().plus({ hours: 3 }).toString(),
+        },
+        exitDate: {
+          [Op.is]: null,
+        },
+        userId,
+      },
+    });
+  } catch (e) {
+    return e;
+  }
+};
+
+const writeUpNewToken = async (login) => {
+  const expAtAccessTime = DateTime.local().plus({ minutes: 2 });
+  const expAtRefreshTime = DateTime.local().plus({ hours: 8 });
+
+  const accessToken = generateToken({
+    login,
+    exp: expAtAccessTime.toSeconds(),
+  });
+  const refreshToken = generateToken({
+    login,
+    exp: expAtRefreshTime.toSeconds(),
+  });
+
+  try {
+    const { id } = await models.Users.findOne({
+      where: { email: login },
+    });
+
+    await models.UserTokens.create({
+      accessToken,
+      refreshToken,
+      startDate: DateTime.local().plus({ hours: 3 }).toString(), // because i fuck this timezone
+      expirationDate: expAtAccessTime.plus({ hours: 3 }), // because i fuck this timezone
+      userId: id,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  } catch (e) {
+    return e;
+  }
+};
 
 class AuthService {
   static async login(req, res) {
     const { login, password } = req.body;
 
-    const user = await models.User.findOne({
+    const user = await models.Users.findOne({
       where: { email: login },
     });
 
@@ -15,14 +72,77 @@ class AuthService {
       res.status(404).send({
         message: 'User not found',
       });
-    } else if (validatePassword(password, user.hash, user.salt)) {
-      res.status(201).json({
-        message: 'Login succeeded',
-      });
+
+      return;
+    }
+
+    if (validatePassword(password, user.hash, user.salt)) {
+      try {
+        const oldActivePair = await findActiveToken(user.id);
+        if (oldActivePair) {
+          const { accessToken, refreshToken } = oldActivePair;
+          res.status(200).json({
+            accessToken,
+            refreshToken,
+          });
+          return;
+        }
+
+        const pairTokens = await writeUpNewToken(login);
+        res.status(200).json({ ...pairTokens });
+      } catch (e) {
+        res.status(422).send({ e });
+      }
     } else {
-      res.status(400).send({
+      res.status(401).send({
         message: 'Invalid password',
       });
+    }
+  }
+
+  static async checkToken(req, res) {
+    const { token, 'user-id': userId } = req.headers;
+
+    try {
+      const user = await findActiveToken(userId);
+
+      if (!user) {
+        await Promise.reject('Session is already expired');
+      }
+
+      await check(token);
+
+      res.status(200).json({
+        message: 'Token is valid',
+      });
+    } catch (err) {
+      res.status(400).send({
+        message: err,
+      });
+    }
+  }
+
+  static async logout(req, res) {
+    const { 'user-id': userId } = req.headers;
+
+    try {
+      await models.UserTokens.update({
+        exitDate: DateTime.local().plus({ hours: 3 }).toString(),
+      },
+      {
+        where: {
+          expirationDate: {
+            [Op.gt]: DateTime.local().plus({ hours: 3 }).toString(),
+          },
+          userId,
+        },
+      });
+
+      res.status(200).json({
+        message: 'Success exit',
+      });
+    } catch (e) {
+      res.status(422).send({ e });
     }
   }
 }

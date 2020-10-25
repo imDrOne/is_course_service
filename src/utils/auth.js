@@ -1,4 +1,8 @@
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const setPassword = (password) => {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -20,7 +24,15 @@ const validatePassword = (password, srcHash, srcSalt) => {
   return hash === srcHash;
 };
 
+const generateToken = (payload, options) => jwt.sign({ ...payload }, process.env.SECRET, { ...options });
+
+const checkToken = (token) => new Promise((resolve, reject) => jwt.verify(token, process.env.SECRET, (err, decoded) => {
+  err ? reject(`Invalid token: ${err.message}`) : resolve(decoded);
+}));
+
 module.exports = {
+  generateToken,
+  checkToken,
   setPassword,
   validatePassword,
 };

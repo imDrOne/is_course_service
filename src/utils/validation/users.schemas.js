@@ -7,15 +7,16 @@ const userId = {
 const newUser = {
   firstName: Joi.string().min(1).required(),
   lastName: Joi.string().optional(),
-  email: Joi.string().email(),
-  password: Joi.string(),
+  email: Joi.string().email().required(),
+  password: Joi.string().required(),
 };
 
 const updateUser = {
   get() {
-    const { password, ...props } = newUser;
+    const { password, email, ...props } = newUser;
     return {
       id: Joi.number().required(),
+      email: Joi.string().email().optional(),
       ...props,
     };
   },

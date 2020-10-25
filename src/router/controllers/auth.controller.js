@@ -11,5 +11,7 @@ router.get('/', (req, res) => {
  * @mapping
  */
 router.post('/login', AuthService.login);
+router.get('/check-token', AuthService.checkToken);
+router.put('/logout', AuthService.logout);
 
 module.exports = router;
