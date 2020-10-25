@@ -1,7 +1,60 @@
+const { DateTime } = require('luxon');
+const { Op } = require('sequelize');
 const models = require('../../db/models');
 const { auth } = require('../../utils');
 
 const { validatePassword, generateToken, checkToken: check } = auth;
+
+const findActiveToken = async (userId) => {
+  try {
+    return await models.UserTokens.findOne({
+      attributes: ['accessToken', 'refreshToken'],
+      where: {
+        expirationDate: {
+          [Op.gt]: DateTime.local().plus({ hours: 3 }).toString(),
+        },
+        userId,
+      },
+    });
+  } catch (e) {
+    return e;
+  }
+};
+
+const writeUpNewToken = async (login) => {
+  const expAtAccessTime = DateTime.local().plus({ minutes: 1 });
+  const expAtRefreshTime = DateTime.local().plus({ hours: 8 });
+
+  const accessToken = generateToken({
+    login,
+    exp: expAtAccessTime.toSeconds(),
+  });
+  const refreshToken = generateToken({
+    login,
+    exp: expAtRefreshTime.toSeconds(),
+  });
+
+  try {
+    const { id } = await models.Users.findOne({
+      where: { email: login },
+    });
+
+    await models.UserTokens.create({
+      accessToken,
+      refreshToken,
+      startDate: DateTime.local().plus({ hours: 3 }), // because i fuck this timezone
+      expirationDate: expAtAccessTime.plus({ hours: 3 }), // because i fuck this timezone
+      userId: id,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  } catch (e) {
+    return e;
+  }
+};
 
 class AuthService {
   static async login(req, res) {
@@ -15,48 +68,29 @@ class AuthService {
       res.status(404).send({
         message: 'User not found',
       });
-    } else if (validatePassword(password, user.hash, user.salt)) {
-      const expAtAccessTime = Math.floor(Date.now() / 1000) + 60 * 2;
-      const expAtRefreshTime = Math.floor(Date.now() / 1000) + 60 * 60;
 
-      const accessToken = generateToken({
-        login,
-        exp: expAtAccessTime,
-      });
-      const refreshToken = generateToken({
-        login,
-        exp: expAtRefreshTime,
-      });
+      return;
+    }
 
+    if (validatePassword(password, user.hash, user.salt)) {
       try {
-        const { id } = await models.Users.findOne({
-          where: { email: login },
-        });
-
-        console.log(id);
-
-        await models.UserTokens.bulkCreate([
-          {
+        const oldActivePair = await findActiveToken(user.id);
+        if (oldActivePair) {
+          const { accessToken, refreshToken } = oldActivePair;
+          res.status(200).json({
             accessToken,
             refreshToken,
-            startDate: new Date(),
-            expirationDate: new Date(expAtAccessTime),
-            exitDate: new Date(),
-            UserId: id,
-          },
-        ]);
+          });
+          return;
+        }
 
-        await models.UserTokens.findAll();
-        res.status(201).json({
-          message: 'Login succeeded',
-          accessToken,
-          refreshToken,
-        });
+        const pairTokens = await writeUpNewToken(login);
+        res.status(200).json({ ...pairTokens });
       } catch (e) {
-        res.status(404);
+        res.status(422).send({ e });
       }
     } else {
-      res.status(400).send({
+      res.status(401).send({
         message: 'Invalid password',
       });
     }
