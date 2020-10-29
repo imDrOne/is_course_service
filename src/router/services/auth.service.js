@@ -9,7 +9,7 @@ const {
   validatePassword,
   generateToken,
   decodeToken,
-  checkToken: check,
+  verifyToken,
 } = auth;
 
 const findActiveSession = async (userId) => {
@@ -115,7 +115,7 @@ class AuthService {
     const { token } = req.headers;
 
     try {
-      const { login } = await check(token);
+      const { login } = await verifyToken(token);
       const { id: userId } = await findUserIdByLogin(login);
       const session = await findActiveSession(userId);
 
@@ -127,7 +127,8 @@ class AuthService {
         message: 'Token is valid',
       });
     } catch (err) {
-      res.status(401).send({
+      console.error(err);
+      res.status(403).send({
         message: err,
       });
     }
@@ -137,7 +138,7 @@ class AuthService {
     const { token: accessToken } = req.headers;
 
     try {
-      const { login } = await check(accessToken);
+      const { login } = await verifyToken(accessToken);
       const { id: userId } = await findUserIdByLogin(login);
 
       await models.UserTokens.update({
@@ -156,8 +157,10 @@ class AuthService {
       res.status(200).json({
         message: 'Success exit',
       });
-    } catch (e) {
-      res.status(422).send({ ...e });
+    } catch (err) {
+      res.status(403).send({
+        message: err,
+      });
     }
   }
 
@@ -165,7 +168,7 @@ class AuthService {
     const { 'refresh-token': refreshToken, 'access-token': accessToken } = req.headers;
 
     try {
-      await check(refreshToken);
+      await verifyToken(refreshToken);
       const { login } = decodeToken(accessToken);
       const expAtAccessTime = DateTime.local().plus({ minutes: 1 });
 
@@ -192,8 +195,10 @@ class AuthService {
       res.status(201).json({
         accessToken: newAccessToken,
       });
-    } catch (e) {
-      res.status(401).send(e);
+    } catch (err) {
+      res.status(403).send({
+        message: err,
+      });
     }
   }
 }

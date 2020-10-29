@@ -26,15 +26,16 @@ const validatePassword = (password, srcHash, srcSalt) => {
 
 const generateToken = (payload, options) => jwt.sign({ ...payload }, process.env.SECRET, { ...options });
 
-const checkToken = (token) => new Promise((resolve, reject) => jwt.verify(token, process.env.SECRET, (err, decoded) => {
-  err ? reject(`Invalid token: ${err.message}`) : resolve(decoded);
+const verifyToken = (token) => new Promise((resolve, reject) => jwt.verify(token, process.env.SECRET, (err, decoded) => {
+  if (err) reject(`Invalid token: ${err.message}`);
+  else resolve(decoded);
 }));
 
 const decodeToken = (token) => jwt.decode(token);
 
 module.exports = {
   generateToken,
-  checkToken,
+  verifyToken,
   setPassword,
   validatePassword,
   decodeToken,
