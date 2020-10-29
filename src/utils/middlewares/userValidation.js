@@ -1,7 +1,6 @@
 const Joi = require('joi');
 
 const userValidation = (schema, property) => (req, res, next) => {
-
   const { error } = Joi
     .object({ ...schema })
     .options({ allowUnknown: true })

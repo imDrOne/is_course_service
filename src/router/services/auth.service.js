@@ -5,9 +5,14 @@ const { Op } = require('sequelize');
 const models = require('../../db/models');
 const { auth } = require('../../utils');
 
-const { validatePassword, generateToken, checkToken: check } = auth;
+const {
+  validatePassword,
+  generateToken,
+  decodeToken,
+  checkToken: check,
+} = auth;
 
-const findActiveToken = async (userId) => {
+const findActiveSession = async (userId) => {
   try {
     return await models.UserTokens.findOne({
       where: {
@@ -33,6 +38,7 @@ const writeUpNewToken = async (login) => {
     login,
     exp: expAtAccessTime.toSeconds(),
   });
+
   const refreshToken = generateToken({
     login,
     exp: expAtRefreshTime.toSeconds(),
@@ -46,8 +52,8 @@ const writeUpNewToken = async (login) => {
     await models.UserTokens.create({
       accessToken,
       refreshToken,
-      startDate: DateTime.local().toString(), // because i fuck this timezone
-      expirationDate: expAtAccessTime.plus({ hours: 3 }), // because i fuck this timezone
+      startDate: DateTime.local().toString(),
+      expirationDate: expAtAccessTime,
       userId: id,
     });
 
@@ -55,6 +61,16 @@ const writeUpNewToken = async (login) => {
       accessToken,
       refreshToken,
     };
+  } catch (e) {
+    return e;
+  }
+};
+
+const findUserIdByLogin = async (login) => {
+  try {
+    return await models.Users.findOne({
+      where: { email: login },
+    });
   } catch (e) {
     return e;
   }
@@ -78,7 +94,7 @@ class AuthService {
 
     if (validatePassword(password, user.hash, user.salt)) {
       try {
-        let pairTokens = await findActiveToken(user.id);
+        let pairTokens = await findActiveSession(user.id);
         if (!pairTokens) {
           pairTokens = await writeUpNewToken(login);
         }
@@ -96,16 +112,16 @@ class AuthService {
   }
 
   static async checkToken(req, res) {
-    const { token, 'user-id': userId } = req.headers;
+    const { token } = req.headers;
 
     try {
-      const user = await findActiveToken(userId);
+      const { login } = await check(token);
+      const { id: userId } = await findUserIdByLogin(login);
+      const session = await findActiveSession(userId);
 
-      if (!user) {
+      if (!session) {
         await Promise.reject('Session is already expired');
       }
-
-      await check(token);
 
       res.status(200).json({
         message: 'Token is valid',
@@ -118,9 +134,12 @@ class AuthService {
   }
 
   static async logout(req, res) {
-    const { 'user-id': userId } = req.headers;
+    const { token: accessToken } = req.headers;
 
     try {
+      const { login } = await check(accessToken);
+      const { id: userId } = await findUserIdByLogin(login);
+
       await models.UserTokens.update({
         exitDate: DateTime.local().toString(),
       },
@@ -129,6 +148,7 @@ class AuthService {
           expirationDate: {
             [Op.gt]: DateTime.local().toString(),
           },
+          accessToken,
           userId,
         },
       });
@@ -142,10 +162,11 @@ class AuthService {
   }
 
   static async refreshToken(req, res) {
-    const { 'refresh-token': refreshToken, 'access-token': accessToken, login } = req.headers;
+    const { 'refresh-token': refreshToken, 'access-token': accessToken } = req.headers;
 
     try {
       await check(refreshToken);
+      const { login } = decodeToken(accessToken);
       const expAtAccessTime = DateTime.local().plus({ minutes: 1 });
 
       const newAccessToken = generateToken({

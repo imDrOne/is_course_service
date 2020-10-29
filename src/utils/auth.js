@@ -30,9 +30,12 @@ const checkToken = (token) => new Promise((resolve, reject) => jwt.verify(token,
   err ? reject(`Invalid token: ${err.message}`) : resolve(decoded);
 }));
 
+const decodeToken = (token) => jwt.decode(token);
+
 module.exports = {
   generateToken,
   checkToken,
   setPassword,
   validatePassword,
+  decodeToken,
 };
