@@ -5,6 +5,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Permissions.belongsToMany(models.Users, {
         through: 'UsersAsPermissions',
+        foreignKey: 'permissionId',
+        as: 'users',
       });
     }
   }

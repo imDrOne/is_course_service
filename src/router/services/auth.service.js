@@ -12,7 +12,7 @@ const findActiveToken = async (userId) => {
     return await models.UserTokens.findOne({
       where: {
         expirationDate: {
-          [Op.gt]: DateTime.local().plus({ hours: 3 }).toString(),
+          [Op.gt]: DateTime.local().toString(),
         },
         exitDate: {
           [Op.is]: null,
@@ -46,7 +46,7 @@ const writeUpNewToken = async (login) => {
     await models.UserTokens.create({
       accessToken,
       refreshToken,
-      startDate: DateTime.local().plus({ hours: 3 }).toString(), // because i fuck this timezone
+      startDate: DateTime.local().toString(), // because i fuck this timezone
       expirationDate: expAtAccessTime.plus({ hours: 3 }), // because i fuck this timezone
       userId: id,
     });
@@ -78,20 +78,15 @@ class AuthService {
 
     if (validatePassword(password, user.hash, user.salt)) {
       try {
-        const oldActivePair = await findActiveToken(user.id);
-        if (oldActivePair) {
-          const { accessToken, refreshToken } = oldActivePair;
-          res.status(200).json({
-            accessToken,
-            refreshToken,
-          });
-          return;
+        let pairTokens = await findActiveToken(user.id);
+        if (!pairTokens) {
+          pairTokens = await writeUpNewToken(login);
         }
 
-        const pairTokens = await writeUpNewToken(login);
-        res.status(200).json({ ...pairTokens });
+        const { accessToken, refreshToken } = pairTokens;
+        res.status(200).json({ accessToken, refreshToken });
       } catch (e) {
-        res.status(422).send({ e });
+        res.status(422).send({ ...e });
       }
     } else {
       res.status(401).send({
@@ -116,7 +111,7 @@ class AuthService {
         message: 'Token is valid',
       });
     } catch (err) {
-      res.status(400).send({
+      res.status(401).send({
         message: err,
       });
     }
@@ -127,12 +122,12 @@ class AuthService {
 
     try {
       await models.UserTokens.update({
-        exitDate: DateTime.local().plus({ hours: 3 }).toString(),
+        exitDate: DateTime.local().toString(),
       },
       {
         where: {
           expirationDate: {
-            [Op.gt]: DateTime.local().plus({ hours: 3 }).toString(),
+            [Op.gt]: DateTime.local().toString(),
           },
           userId,
         },
@@ -142,7 +137,7 @@ class AuthService {
         message: 'Success exit',
       });
     } catch (e) {
-      res.status(422).send({ e });
+      res.status(422).send({ ...e });
     }
   }
 
@@ -160,7 +155,7 @@ class AuthService {
 
       const result = await models.UserTokens.update({
         accessToken: newAccessToken,
-        expirationDate: expAtAccessTime.plus({ hours: 3 }),
+        expirationDate: expAtAccessTime,
       }, {
         where: {
           accessToken,
@@ -177,7 +172,7 @@ class AuthService {
         accessToken: newAccessToken,
       });
     } catch (e) {
-      res.status(422).send({ e });
+      res.status(401).send(e);
     }
   }
 }
