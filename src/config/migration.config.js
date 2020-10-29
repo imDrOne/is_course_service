@@ -16,6 +16,7 @@ module.exports = {
     dialect: 'postgres',
     schema: 'main',
     searchPath: 'main',
+    timezone: '+03:00',
     dialectOptions: {
       prependSearchPath: true,
       ssl: {
@@ -33,6 +34,7 @@ module.exports = {
     dialect: 'postgres',
     schema: 'main',
     searchPath: 'main',
+    timezone: '+03:00',
     dialectOptions: {
       prependSearchPath: true,
       ssl: {
@@ -50,6 +52,7 @@ module.exports = {
     dialect: 'postgres',
     schema: 'main',
     searchPath: 'main',
+    timezone: '+03:00',
     dialectOptions: {
       prependSearchPath: true,
       ssl: {
