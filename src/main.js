@@ -1,6 +1,7 @@
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 // Init app express
 const app = express();
@@ -23,6 +24,7 @@ const BASE_API_URL = `/${process.env.APP_API_VERSION}/api/uis-dashboard-service`
 // Middlewares
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cors());
 
 // Routes
 app.get('/', (req, res) => {
