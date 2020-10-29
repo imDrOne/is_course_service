@@ -138,7 +138,7 @@ class AuthService {
     const { token: accessToken } = req.headers;
 
     try {
-      const { login } = await verifyToken(accessToken);
+      const { login } = decodeToken(accessToken);
       const { id: userId } = await findUserIdByLogin(login);
 
       await models.UserTokens.update({
@@ -146,9 +146,6 @@ class AuthService {
       },
       {
         where: {
-          expirationDate: {
-            [Op.gt]: DateTime.local().toString(),
-          },
           accessToken,
           userId,
         },
