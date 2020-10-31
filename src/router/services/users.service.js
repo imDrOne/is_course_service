@@ -1,26 +1,48 @@
+const { Op } = require('sequelize');
+
 const models = require('../../db/models');
 const { auth } = require('../../utils');
 
 const { setPassword } = auth;
 
+const optionsForAllUsers = {
+  attributes: {
+    exclude: ['hash', 'salt', 'id'],
+  },
+  include: [{
+    as: 'permissions',
+    model: models.Permissions,
+    attributes: {
+      exclude: ['id'],
+    },
+    through: {
+      attributes: [],
+    },
+  }],
+};
+
+/**
+* @return Array of objects [ {id: someINT} ]
+* */
+const getPermissionsIDs = async (permissions) => {
+  try {
+    return await models.Permissions.findAll({
+      attributes: ['id'],
+      where: {
+        permissionCode: {
+          [Op.or]: permissions,
+        },
+      },
+    });
+  } catch (e) {
+    return e;
+  }
+};
+
 class UserService {
   static async getAllUsers(req, res) {
     try {
-      const users = await models.Users.findAll({
-        attributes: {
-          exclude: ['hash', 'salt', 'id'],
-        },
-        include: [{
-          as: 'permissions',
-          model: models.Permissions,
-          attributes: {
-            exclude: ['id'],
-          },
-          through: {
-            attributes: [],
-          },
-        }],
-      });
+      const users = await models.Users.findAll({ ...optionsForAllUsers });
       res.json(users);
     } catch (e) {
       res.json(e);
@@ -42,23 +64,33 @@ class UserService {
 
   static async createUser(req, res) {
     const {
-      firstName, lastName, email, password,
+      firstName, lastName, email, password, permissions,
     } = req.body;
 
     const { salt, hash } = setPassword(password);
 
     try {
-      await models.Users.create({
+      const user = await models.Users.create({
         firstName,
         lastName,
         email,
         salt,
         hash,
       });
+
+      const permissionsIDs = await getPermissionsIDs([...permissions]);
+
+      const userAsPermissions = permissionsIDs.map((permission) => ({
+        userId: user.id,
+        permissionId: permission.id,
+      }));
+
+      await models.UsersAsPermissions.bulkCreate([...userAsPermissions]);
+
       const updatedUserList = await UserService.getAllUsers(req, res);
-      res.json(updatedUserList);
+      res.status(201).json(updatedUserList);
     } catch (e) {
-      res.json(e);
+      res.status(500).json({ ...e });
     }
   }
 
@@ -78,19 +110,35 @@ class UserService {
 
   static async updateUserById(req, res) {
     const {
-      id, ...body
+      oldEmail, newEmail, ...body
     } = req.body;
 
     try {
       await models.Users.update(
-        { ...body },
-        { where: { id } },
+        { email: newEmail, ...body },
+        { where: { email: oldEmail } },
       );
 
-      const updatedUserList = await UserService.getAllUsers(req, res);
-      res.json(updatedUserList);
+      const user = await models.Users.findOne({
+        where: { email: newEmail || oldEmail },
+      });
+
+      if (body.permissions) {
+        const permissionsIDs = await getPermissionsIDs([body.permissions]);
+        const userAsPermissions = permissionsIDs.map((permission) => ({
+          userId: user.id,
+          permissionId: permission.id,
+        }));
+        await models.UsersAsPermissions.destroy({
+          where: { userId: user.id },
+        });
+        await models.UsersAsPermissions.bulkCreate([...userAsPermissions]);
+      }
+
+      const users = await models.Users.findAll({ ...optionsForAllUsers });
+      res.status(201).json(users);
     } catch (e) {
-      res.json(e);
+      res.status(500).json({ ...e });
     }
   }
 }

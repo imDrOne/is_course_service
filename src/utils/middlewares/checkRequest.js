@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const userValidation = (schema, property) => (req, res, next) => {
+const checkRequest = (schema, property) => (req, res, next) => {
   const { error } = Joi
     .object({ ...schema })
     .options({ allowUnknown: true })
@@ -20,4 +20,4 @@ const userValidation = (schema, property) => (req, res, next) => {
   }
 };
 
-module.exports = userValidation;
+module.exports = checkRequest;

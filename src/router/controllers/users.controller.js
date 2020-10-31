@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const UserService = require('../services/users.service');
 
-const { userValidations, guard } = require('../../utils/middlewares');
+const { checkRequest, checkValidToken, checkUserPermissions } = require('../../utils/middlewares');
 
 const {
   usersValidationSchemas: {
@@ -22,35 +22,37 @@ router.get('/', ((req, res) => {
  */
 router.get(
   '/users',
-  guard,
+  // guard,
   UserService.getAllUsers,
 );
 
 router.get(
   '/userById',
-  guard,
-  userValidations(userId, 'headers'),
+  checkValidToken,
+  checkRequest(userId, 'headers'),
   UserService.getUserById,
 );
 
 router.post(
   '/newUser',
-  guard,
-  userValidations(newUser, 'body'),
+  checkValidToken,
+  checkRequest(newUser, 'body'),
+  checkUserPermissions('can__CreateUsers'),
   UserService.createUser,
 );
 
 router.delete(
   '/delUserById',
-  guard,
-  userValidations(userId, 'headers'),
+  checkValidToken,
+  checkRequest(userId, 'headers'),
   UserService.deleteUserById,
 );
 
 router.put(
   '/updateUserById',
-  guard,
-  userValidations(updateUser.get(), 'body'),
+  checkValidToken,
+  checkRequest(updateUser, 'body'),
+  checkUserPermissions('can__EditUsers'),
   UserService.updateUserById,
 );
 

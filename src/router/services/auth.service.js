@@ -31,7 +31,7 @@ const findActiveSession = async (userId) => {
 };
 
 const writeUpNewToken = async (login) => {
-  const expAtAccessTime = DateTime.local().plus({ minutes: 1 });
+  const expAtAccessTime = DateTime.local().plus({ minutes: 5 });
   const expAtRefreshTime = DateTime.local().plus({ hours: 8 });
 
   const accessToken = generateToken({
@@ -189,7 +189,7 @@ class AuthService {
     try {
       await verifyToken(refreshToken);
       const { login } = decodeToken(accessToken);
-      const expAtAccessTime = DateTime.local().plus({ minutes: 1 });
+      const expAtAccessTime = DateTime.local().plus({ minutes: 5 });
 
       const newAccessToken = generateToken({
         login,

@@ -11,6 +11,8 @@ module.exports = {
       },
       permissionCode: {
         type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
       },
       permissionName: {
         type: Sequelize.STRING,

@@ -1,7 +1,9 @@
-const userValidations = require('./userValidation');
-const guard = require('./guard');
+const checkRequest = require('./checkRequest');
+const checkValidToken = require('./checkValidToken');
+const checkUserPermissions = require('./checkUserPermissions');
 
 module.exports = {
-  userValidations,
-  guard,
+  checkRequest,
+  checkValidToken,
+  checkUserPermissions,
 };
