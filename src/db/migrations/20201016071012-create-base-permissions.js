@@ -1,11 +1,16 @@
 const records = [
   {
-    permissionName: 'can__CreateUsers',
+    permissionName: 'Создавать пользователей',
+    permissionCode: 'can__CreateUsers',
   },
   {
-    permissionName: 'can__ViewUsers',
+    permissionCode: 'can__ViewUsers',
+    permissionName: 'Просмотр пользователей',
   },
-  { permissionName: 'can__EditUsers' },
+  {
+    permissionCode: 'can__EditUsers',
+    permissionName: 'Редактирование пользоватлей',
+  },
 ];
 
 module.exports = {

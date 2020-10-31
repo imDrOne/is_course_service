@@ -31,7 +31,7 @@ const findActiveSession = async (userId) => {
 };
 
 const writeUpNewToken = async (login) => {
-  const expAtAccessTime = DateTime.local().plus({ minutes: 1 });
+  const expAtAccessTime = DateTime.local().plus({ minutes: 5 });
   const expAtRefreshTime = DateTime.local().plus({ hours: 8 });
 
   const accessToken = generateToken({
@@ -76,13 +76,33 @@ const findUserIdByLogin = async (login) => {
   }
 };
 
+const findUserPermissions = async (userId) => {
+  try {
+    const result = await models.Users.findOne({
+      where: { id: userId },
+      attributes: [],
+      include: [{
+        as: 'permissions',
+        model: models.Permissions,
+        through: {
+          attributes: [],
+        },
+      }],
+    });
+    return result.permissions.map((value) => ({
+      name: value.permissionName,
+      code: value.permissionCode,
+    }));
+  } catch (e) {
+    return e;
+  }
+};
+
 class AuthService {
   static async login(req, res) {
     const { login, password } = req.body;
 
-    const user = await models.Users.findOne({
-      where: { email: login },
-    });
+    const user = await findUserIdByLogin(login);
 
     if (user === null) {
       res.status(404).send({
@@ -99,8 +119,10 @@ class AuthService {
           pairTokens = await writeUpNewToken(login);
         }
 
+        const permissions = await findUserPermissions(user.id);
+
         const { accessToken, refreshToken } = pairTokens;
-        res.status(200).json({ accessToken, refreshToken });
+        res.status(200).json({ accessToken, refreshToken, permissions });
       } catch (e) {
         res.status(422).send({ ...e });
       }
@@ -167,7 +189,7 @@ class AuthService {
     try {
       await verifyToken(refreshToken);
       const { login } = decodeToken(accessToken);
-      const expAtAccessTime = DateTime.local().plus({ minutes: 1 });
+      const expAtAccessTime = DateTime.local().plus({ minutes: 5 });
 
       const newAccessToken = generateToken({
         login,

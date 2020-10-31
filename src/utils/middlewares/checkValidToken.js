@@ -1,4 +1,4 @@
-const { verifyToken } = require('../auth');
+const { verifyToken } = require('../auth.utils');
 
 module.exports = (req, res, next) => {
   const { token } = req.headers;

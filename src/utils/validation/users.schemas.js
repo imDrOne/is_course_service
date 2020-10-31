@@ -9,17 +9,15 @@ const newUser = {
   lastName: Joi.string().optional(),
   email: Joi.string().email().required(),
   password: Joi.string().required(),
+  permissions: Joi.array().items(Joi.string()).required(),
 };
 
 const updateUser = {
-  get() {
-    const { password, email, ...props } = newUser;
-    return {
-      id: Joi.number().required(),
-      email: Joi.string().email().optional(),
-      ...props,
-    };
-  },
+  firstName: Joi.string().min(1).required(),
+  lastName: Joi.string().optional(),
+  newEmail: Joi.string().email().optional(),
+  oldEmail: Joi.string().email().required(),
+  permissions: Joi.array().items(Joi.string()).optional(),
 };
 
 module.exports = {

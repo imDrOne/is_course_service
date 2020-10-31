@@ -2,11 +2,11 @@ const models = require('../../db/models');
 
 class PermissionsService {
   static async getUserPermissions(req, res) {
-    const { id } = req.headers;
+    const { login } = req.headers;
 
     try {
       let result = await models.Users.findOne({
-        where: { id },
+        where: { email: login },
         attributes: [],
         include: [{
           as: 'permissions',
@@ -16,7 +16,10 @@ class PermissionsService {
           },
         }],
       });
-      result = result.permissions.map((value) => value.permissionName);
+      result = result.permissions.map((value) => ({
+        name: value.permissionName,
+        code: value.permissionCode,
+      }));
 
       res.status(200).json(result);
     } catch (e) {
