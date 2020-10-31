@@ -6,7 +6,21 @@ const { setPassword } = auth;
 class UserService {
   static async getAllUsers(req, res) {
     try {
-      const users = await models.Users.findAll();
+      const users = await models.Users.findAll({
+        attributes: {
+          exclude: ['hash', 'salt', 'id'],
+        },
+        include: [{
+          as: 'permissions',
+          model: models.Permissions,
+          attributes: {
+            exclude: ['id'],
+          },
+          through: {
+            attributes: [],
+          },
+        }],
+      });
       res.json(users);
     } catch (e) {
       res.json(e);
