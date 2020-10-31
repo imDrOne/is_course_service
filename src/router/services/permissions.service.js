@@ -16,7 +16,10 @@ class PermissionsService {
           },
         }],
       });
-      result = result.permissions.map((value) => value.permissionName);
+      result = result.permissions.map((value) => ({
+        name: value.permissionName,
+        code: value.permissionCode,
+      }));
 
       res.status(200).json(result);
     } catch (e) {
