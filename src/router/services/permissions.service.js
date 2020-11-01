@@ -26,6 +26,20 @@ class PermissionsService {
       res.status(500).json({ ...e });
     }
   }
+
+  static async getAllPermissions(req, res) {
+    try {
+      const permissions = await models.Permissions.findAll({
+        attributes: {
+          exclude: 'id',
+        },
+      });
+
+      res.status(200).json(permissions);
+    } catch (e) {
+      res.status(500).json({ ...e });
+    }
+  }
 }
 
 module.exports = PermissionsService;

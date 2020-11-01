@@ -1,7 +1,7 @@
 const models = require('../../db/models');
 const { verifyToken } = require('../auth.utils');
 
-module.exports = (permission) => async (req, res, next) => {
+module.exports = (...permissions) => async (req, res, next) => {
   const { token } = req.headers;
 
   try {
@@ -17,8 +17,11 @@ module.exports = (permission) => async (req, res, next) => {
         },
       }],
     });
+
     const userPermissions = user.permissions.map((value) => value.permissionCode);
-    if (userPermissions.includes(permission)) {
+    const checkResult = userPermissions.some((code) => permissions.includes(code));
+
+    if (checkResult) {
       next();
     } else res.status(403).send('Access denied');
   } catch (e) {

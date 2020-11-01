@@ -22,7 +22,8 @@ router.get('/', ((req, res) => {
  */
 router.get(
   '/users',
-  // guard,
+  checkValidToken,
+  checkUserPermissions('can__ViewUsers'),
   UserService.getAllUsers,
 );
 
