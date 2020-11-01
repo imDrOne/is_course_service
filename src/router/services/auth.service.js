@@ -80,7 +80,7 @@ const findUserPermissions = async (userId) => {
   try {
     const result = await models.Users.findOne({
       where: { id: userId },
-      attributes: [],
+      attributes: ['firstName', 'lastName', 'email'],
       include: [{
         as: 'permissions',
         model: models.Permissions,
@@ -89,10 +89,18 @@ const findUserPermissions = async (userId) => {
         },
       }],
     });
-    return result.permissions.map((value) => ({
+    let {
+      permissions, firstName, lastName, email,
+    } = result;
+
+    permissions = permissions.map((value) => ({
       name: value.permissionName,
       code: value.permissionCode,
     }));
+
+    return {
+      permissions, firstName, lastName, email,
+    };
   } catch (e) {
     return e;
   }
@@ -119,10 +127,12 @@ class AuthService {
           pairTokens = await writeUpNewToken(login);
         }
 
-        const permissions = await findUserPermissions(user.id);
+        const { permissions, ...requisites } = await findUserPermissions(user.id);
 
         const { accessToken, refreshToken } = pairTokens;
-        res.status(200).json({ accessToken, refreshToken, permissions });
+        res.status(200).json({
+          accessToken, refreshToken, permissions, requisites,
+        });
       } catch (e) {
         res.status(422).send({ ...e });
       }
