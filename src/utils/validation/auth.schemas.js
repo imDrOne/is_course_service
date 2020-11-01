@@ -6,12 +6,12 @@ const loginSchema = {
 };
 
 const singleAccessTokenSchema = {
-  token: Joi.string().token(),
+  token: Joi.string().required(),
 };
 
 const refreshTokenSchema = {
-  'access-token': Joi.string().token(),
-  'refresh-token': Joi.string().token(),
+  'access-token': Joi.string().required(),
+  'refresh-token': Joi.string().required(),
 };
 
 module.exports = {
